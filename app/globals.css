@@ -900,6 +900,7 @@ input:focus-visible {
 .lyric-line {
   position: relative;
   display: grid;
+  flex: 0 0 auto;
   grid-template-columns: 31px minmax(0, 1fr) 34px;
   gap: 11px;
   align-items: center;
