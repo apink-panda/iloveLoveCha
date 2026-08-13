@@ -510,7 +510,13 @@ input:focus-visible {
   line-height: 1.25;
 }
 
-.focus-lyric-copy span {
+.timed-word {
+  display: inline-flex;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.focus-lyric-copy .focus-unit {
   background: linear-gradient(
     90deg,
     var(--pearl) 0 var(--word-progress),
@@ -520,7 +526,7 @@ input:focus-visible {
   color: transparent;
 }
 
-.focus-lyric.is-singing .focus-lyric-copy span {
+.focus-lyric.is-singing .focus-unit {
   filter: drop-shadow(0 0 9px rgba(255, 117, 151, 0.16));
 }
 

@@ -9,16 +9,93 @@ const CHALLENGE_END = 119;
 const CHALLENGE_LENGTH = CHALLENGE_END - CHALLENGE_START;
 const DEFAULT_VOLUME = 82;
 
+type TimedWord = {
+  text: string;
+  start: number;
+  end: number;
+};
+
+type LyricLine = {
+  start: number;
+  end: number;
+  text: string;
+  words: TimedWord[];
+};
+
+function makeLine(words: TimedWord[]): LyricLine {
+  return {
+    start: words[0].start,
+    end: words[words.length - 1].end,
+    text: words.map((word) => word.text).join(" "),
+    words,
+  };
+}
+
 const lyricLines = [
-  { start: 88, end: 93.1, text: "멀어져도 다시 내게 돌아오는 물결처럼" },
-  { start: 93.1, end: 96, text: "You always save me again" },
-  { start: 96.5, end: 100, text: "더 깊이 네게로 가 Just Dive" },
-  { start: 101, end: 105, text: "손 닿지 않아 멀어져도 난 Just Love" },
-  { start: 105, end: 108, text: "보이지 않는" },
-  { start: 108, end: 111, text: "깊은 바닷속 어둠" },
-  { start: 111, end: 115, text: "요동치는 일렁임까지" },
-  { start: 115, end: 118, text: "Oh I I love ‘LOVE’ ‘LOVE’" },
-] as const;
+  makeLine([
+    { text: "멀어져도", start: 88.6, end: 89.74 },
+    { text: "다시", start: 89.74, end: 90.18 },
+    { text: "내게", start: 90.18, end: 90.78 },
+    { text: "돌아오는", start: 90.78, end: 92.18 },
+    { text: "물결처럼", start: 92.18, end: 93.18 },
+  ]),
+  makeLine([
+    { text: "You", start: 93.18, end: 93.72 },
+    { text: "always", start: 93.72, end: 94.5 },
+    { text: "save", start: 94.5, end: 95 },
+    { text: "me", start: 95, end: 95.36 },
+    { text: "again", start: 95.36, end: 96.12 },
+  ]),
+  makeLine([
+    { text: "더", start: 96.12, end: 96.96 },
+    { text: "깊이", start: 96.96, end: 97.56 },
+    { text: "네게로", start: 97.56, end: 98.62 },
+    { text: "가", start: 98.62, end: 99.3 },
+    { text: "Just", start: 99.3, end: 100.04 },
+    { text: "Dive", start: 100.04, end: 100.88 },
+  ]),
+  makeLine([
+    { text: "손", start: 100.88, end: 101.26 },
+    { text: "닿지", start: 101.26, end: 101.76 },
+    { text: "않아", start: 101.76, end: 102.34 },
+    { text: "멀어져도", start: 102.34, end: 103.74 },
+    { text: "난", start: 103.74, end: 104.28 },
+    { text: "Just", start: 104.28, end: 105 },
+    { text: "Love", start: 105, end: 105.6 },
+  ]),
+  makeLine([
+    { text: "보이지", start: 105.6, end: 106.72 },
+    { text: "않는", start: 106.72, end: 107.44 },
+  ]),
+  makeLine([
+    { text: "깊은", start: 107.44, end: 108.88 },
+    { text: "바닷속", start: 108.88, end: 109.74 },
+    { text: "어둠", start: 109.74, end: 110.74 },
+  ]),
+  makeLine([
+    { text: "요동치는", start: 110.74, end: 112.14 },
+    { text: "일렁임까지", start: 112.14, end: 114.06 },
+  ]),
+  makeLine([
+    { text: "Oh", start: 115, end: 115.14 },
+    { text: "I", start: 115.14, end: 115.62 },
+    { text: "I", start: 115.62, end: 116.32 },
+    { text: "love", start: 116.32, end: 116.72 },
+    { text: "‘LOVE’", start: 116.72, end: 117.28 },
+    { text: "‘LOVE’", start: 117.28, end: 118 },
+  ]),
+];
+
+function getTimedUnits(word: TimedWord) {
+  const parts = /^[가-힣]+$/.test(word.text) ? Array.from(word.text) : [word.text];
+  const unitDuration = (word.end - word.start) / parts.length;
+
+  return parts.map((text, index) => ({
+    text,
+    start: word.start + unitDuration * index,
+    end: word.start + unitDuration * (index + 1),
+  }));
+}
 
 type Phase = "idle" | "countdown" | "singing" | "finished";
 
@@ -184,14 +261,6 @@ export default function Home() {
     activeLine ??
     (phase === "finished" || hasCompletedLyrics ? finalLine : nextLine) ??
     lyricLines[0];
-  const focusLineProgress = activeLine
-    ? clamp(
-        (currentTime - activeLine.start) / (activeLine.end - activeLine.start),
-      )
-    : phase === "finished" || hasCompletedLyrics
-      ? 1
-      : 0;
-  const focusWords = focusLine.text.split(" ");
   const focusLabel = activeLine
     ? "NOW · 現在唱"
     : phase === "finished" || hasCompletedLyrics
@@ -371,20 +440,28 @@ export default function Home() {
                 )}
               </div>
               <p className="focus-lyric-copy" lang="ko">
-                {focusWords.map((word, wordIndex) => {
-                  const wordProgress = clamp(
-                    focusLineProgress * focusWords.length - wordIndex,
-                  );
+                {focusLine.words.map((word, wordIndex) => {
+                  const units = getTimedUnits(word);
                   return (
-                    <span
-                      key={`${focusLine.text}-focus-${wordIndex}`}
-                      style={
-                        {
-                          "--word-progress": `${wordProgress * 100}%`,
-                        } as React.CSSProperties
-                      }
-                    >
-                      {word}
+                    <span className="timed-word" key={`${focusLine.text}-focus-${wordIndex}`}>
+                      {units.map((unit, unitIndex) => {
+                        const unitProgress = clamp(
+                          (currentTime - unit.start) / (unit.end - unit.start),
+                        );
+                        return (
+                          <span
+                            className="focus-unit"
+                            key={`${word.text}-${unitIndex}`}
+                            style={
+                              {
+                                "--word-progress": `${unitProgress * 100}%`,
+                              } as React.CSSProperties
+                            }
+                          >
+                            {unit.text}
+                          </span>
+                        );
+                      })}
                     </span>
                   );
                 })}
@@ -488,10 +565,6 @@ export default function Home() {
               {lyricLines.map((line, lineIndex) => {
                 const isPast = currentTime >= line.end;
                 const isCurrent = lineIndex === activeLineIndex;
-                const words = line.text.split(" ");
-                const lineProgress = clamp(
-                  (currentTime - line.start) / (line.end - line.start),
-                );
 
                 return (
                   <button
@@ -507,21 +580,28 @@ export default function Home() {
                       {(lineIndex + 1).toString().padStart(2, "0")}
                     </span>
                     <span className="line-copy" lang="ko">
-                      {words.map((word, wordIndex) => {
-                        const wordProgress = clamp(
-                          lineProgress * words.length - wordIndex,
-                        );
+                      {line.words.map((word, wordIndex) => {
+                        const units = getTimedUnits(word);
                         return (
-                          <span
-                            className="lyric-word"
-                            key={`${line.text}-${wordIndex}`}
-                            style={
-                              {
-                                "--word-progress": `${wordProgress * 100}%`,
-                              } as React.CSSProperties
-                            }
-                          >
-                            {word}
+                          <span className="timed-word" key={`${line.text}-${wordIndex}`}>
+                            {units.map((unit, unitIndex) => {
+                              const unitProgress = clamp(
+                                (currentTime - unit.start) / (unit.end - unit.start),
+                              );
+                              return (
+                                <span
+                                  className="lyric-word"
+                                  key={`${word.text}-${unitIndex}`}
+                                  style={
+                                    {
+                                      "--word-progress": `${unitProgress * 100}%`,
+                                    } as React.CSSProperties
+                                  }
+                                >
+                                  {unit.text}
+                                </span>
+                              );
+                            })}
                           </span>
                         );
                       })}
