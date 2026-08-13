@@ -263,7 +263,7 @@ export default function Home() {
           <span className="brand-mark" aria-hidden="true">
             J
           </span>
-          <span>JUST LOVE</span>
+          <span>파도 (i love LOVE)</span>
         </a>
         <div className="session-label">
           <span className="live-dot" />
@@ -290,7 +290,7 @@ export default function Home() {
           </div>
           <div>
             <p className="meta-label">TODAY&apos;S VERSE</p>
-            <p className="meta-title">Just Love · Chorus challenge</p>
+            <p className="meta-title">파도 (i love LOVE) · Chorus challenge</p>
           </div>
           <div className="timecode">
             <span>{formatTime(elapsed)}</span>
