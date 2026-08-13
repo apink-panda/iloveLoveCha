@@ -871,7 +871,7 @@ input:focus-visible {
   flex: 1;
   max-height: 370px;
   flex-direction: column;
-  gap: 3px;
+  gap: 8px;
   margin: 18px -12px 0;
   padding: 2px 12px 34px;
   overflow-y: auto;
@@ -879,6 +879,22 @@ input:focus-visible {
   scrollbar-width: thin;
   mask-image: linear-gradient(to bottom, black 0, black 84%, transparent 100%);
   scroll-padding-block: 70px;
+}
+
+.lyrics-window.has-assists {
+  gap: 14px;
+}
+
+.lyrics-window.has-two-assists {
+  gap: 18px;
+}
+
+.lyrics-window.has-assists .lyric-line {
+  padding-block: 12px;
+}
+
+.lyrics-window.has-two-assists .line-content {
+  gap: 7px;
 }
 
 .lyric-line {
@@ -975,6 +991,12 @@ input:focus-visible {
 
 .line-translation {
   color: #80839a;
+}
+
+.line-assist + .line-assist {
+  margin-top: 1px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .lyric-line.is-current .line-copy {

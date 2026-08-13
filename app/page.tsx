@@ -649,7 +649,10 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="lyrics-window" ref={lyricsWindowRef}>
+            <div
+              className={`lyrics-window ${showKaraoke || showTranslation ? "has-assists" : ""} ${showKaraoke && showTranslation ? "has-two-assists" : ""}`}
+              ref={lyricsWindowRef}
+            >
               {lyricLines.map((line, lineIndex) => {
                 const isPast = currentTime >= line.end;
                 const isCurrent = lineIndex === activeLineIndex;
