@@ -8,6 +8,7 @@ const CHALLENGE_START = 88;
 const CHALLENGE_END = 119;
 const CHALLENGE_LENGTH = CHALLENGE_END - CHALLENGE_START;
 const DEFAULT_VOLUME = 82;
+const KARAOKE_MODE_ENABLED = false;
 
 type TimedWord = {
   text: string;
@@ -193,6 +194,8 @@ export default function Home() {
   const [showTranslation, setShowTranslation] = useState(false);
 
   useEffect(() => {
+    if (!KARAOKE_MODE_ENABLED) return;
+
     const audio = new Audio("./pado-karaoke-hq-85-119.mp3");
     audio.preload = "auto";
     audio.volume = DEFAULT_VOLUME / 100;
@@ -653,24 +656,26 @@ export default function Home() {
               ))}
             </div>
 
-            <button
-              className={`karaoke-control ${isKaraoke ? "is-active" : ""}`}
-              type="button"
-              onClick={toggleKaraoke}
-              disabled={!isPlayerReady}
-              aria-pressed={isKaraoke}
-            >
-              <span className="karaoke-symbol" aria-hidden="true">
-                {isKaraoke ? "♫" : "♪"}
-              </span>
-              <span className="karaoke-copy">
-                <strong>{isKaraoke ? "卡拉版已開啟" : "開啟卡拉版"}</strong>
-                <small>{isKaraoke ? "MV 畫面保留 · 高品質去人聲伴奏" : "切換為高品質去人聲伴奏"}</small>
-              </span>
-              <span className="karaoke-switch" aria-hidden="true">
-                <i />
-              </span>
-            </button>
+            {KARAOKE_MODE_ENABLED && (
+              <button
+                className={`karaoke-control ${isKaraoke ? "is-active" : ""}`}
+                type="button"
+                onClick={toggleKaraoke}
+                disabled={!isPlayerReady}
+                aria-pressed={isKaraoke}
+              >
+                <span className="karaoke-symbol" aria-hidden="true">
+                  {isKaraoke ? "♫" : "♪"}
+                </span>
+                <span className="karaoke-copy">
+                  <strong>{isKaraoke ? "卡拉版已開啟" : "開啟卡拉版"}</strong>
+                  <small>{isKaraoke ? "MV 畫面保留 · 高品質去人聲伴奏" : "切換為高品質去人聲伴奏"}</small>
+                </span>
+                <span className="karaoke-switch" aria-hidden="true">
+                  <i />
+                </span>
+              </button>
+            )}
 
             <div className="player-controls">
               <button
