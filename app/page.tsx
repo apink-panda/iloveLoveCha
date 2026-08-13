@@ -14,9 +14,10 @@ const lyricLines = [
   { start: 93.1, end: 96, text: "You always save me again" },
   { start: 96.5, end: 100, text: "더 깊이 네게로 가 Just Dive" },
   { start: 101, end: 105, text: "손 닿지 않아 멀어져도 난 Just Love" },
-  { start: 105, end: 109, text: "보이지 않는 깊은 바닷속" },
-  { start: 109, end: 114, text: "어둠 요동치는 일렁임까지" },
-  { start: 114, end: 119, text: "Oh I I love ‘LOVE’ ‘LOVE’" },
+  { start: 105, end: 108, text: "보이지 않는" },
+  { start: 108, end: 111, text: "깊은 바닷속 어둠" },
+  { start: 111, end: 115, text: "요동치는 일렁임까지" },
+  { start: 115, end: 118, text: "Oh I I love ‘LOVE’ ‘LOVE’" },
 ] as const;
 
 type Phase = "idle" | "countdown" | "singing" | "finished";
@@ -177,21 +178,23 @@ export default function Home() {
   const activeLine =
     activeLineIndex >= 0 ? lyricLines[activeLineIndex] : undefined;
   const nextLine = lyricLines.find((line) => line.start > currentTime);
+  const finalLine = lyricLines[lyricLines.length - 1];
+  const hasCompletedLyrics = currentTime >= finalLine.end;
   const focusLine =
     activeLine ??
-    (phase === "finished" ? lyricLines[lyricLines.length - 1] : nextLine) ??
+    (phase === "finished" || hasCompletedLyrics ? finalLine : nextLine) ??
     lyricLines[0];
   const focusLineProgress = activeLine
     ? clamp(
         (currentTime - activeLine.start) / (activeLine.end - activeLine.start),
       )
-    : phase === "finished"
+    : phase === "finished" || hasCompletedLyrics
       ? 1
       : 0;
   const focusWords = focusLine.text.split(" ");
   const focusLabel = activeLine
     ? "NOW · 現在唱"
-    : phase === "finished"
+    : phase === "finished" || hasCompletedLyrics
       ? "COMPLETE · 完成"
       : phase === "idle"
         ? "FIRST LINE · 第一句"
