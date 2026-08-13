@@ -628,12 +628,19 @@ input:focus-visible {
   line-height: 1.45;
 }
 
-.focus-assists p > span {
+.focus-assists p > span:first-child {
   flex: 0 0 auto;
   color: var(--violet-soft);
   font-size: 8px;
   font-weight: 800;
   letter-spacing: 0.1em;
+}
+
+.focus-assists .assist-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+  color: inherit;
+  overflow-wrap: anywhere;
 }
 
 .focus-assists .assist-translation {
@@ -934,7 +941,8 @@ input:focus-visible {
 .line-content {
   display: grid;
   min-width: 0;
-  gap: 3px;
+  gap: 5px;
+  padding-block: 2px;
 }
 
 .line-copy {
@@ -950,11 +958,15 @@ input:focus-visible {
 }
 
 .line-assist {
+  display: block;
+  min-width: 0;
   color: #8f92aa;
   font-size: 11px;
   font-weight: 560;
   letter-spacing: 0.01em;
   line-height: 1.35;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .line-karaoke {

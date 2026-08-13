@@ -177,6 +177,7 @@ export default function Home() {
   const playerRef = useRef<YouTubePlayer | null>(null);
   const phaseRef = useRef<Phase>("idle");
   const activeLineRef = useRef<HTMLButtonElement | null>(null);
+  const lyricsWindowRef = useRef<HTMLDivElement | null>(null);
   const [isPlayerReady, setIsPlayerReady] = useState(false);
   const [phase, setPhase] = useState<Phase>("idle");
   const [isPaused, setIsPaused] = useState(false);
@@ -309,12 +310,19 @@ export default function Home() {
   const isRunning = phase === "countdown" || phase === "singing";
 
   useEffect(() => {
-    if (activeLineIndex >= 0) {
-      activeLineRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }
+    const activeLineElement = activeLineRef.current;
+    const lyricsWindow = lyricsWindowRef.current;
+    if (activeLineIndex < 0 || !activeLineElement || !lyricsWindow) return;
+
+    const windowRect = lyricsWindow.getBoundingClientRect();
+    const lineRect = activeLineElement.getBoundingClientRect();
+    const lineCenter =
+      lineRect.top - windowRect.top + lyricsWindow.scrollTop + lineRect.height / 2;
+
+    lyricsWindow.scrollTo({
+      top: Math.max(0, lineCenter - lyricsWindow.clientHeight / 2),
+      behavior: "smooth",
+    });
   }, [activeLineIndex]);
 
   const startChallenge = useCallback(() => {
@@ -535,13 +543,13 @@ export default function Home() {
                   {showKaraoke && focusLine.karaoke && (
                     <p className="assist-karaoke">
                       <span>空耳</span>
-                      {focusLine.karaoke}
+                      <span className="assist-copy">{focusLine.karaoke}</span>
                     </p>
                   )}
                   {showTranslation && focusLine.translation && (
                     <p className="assist-translation">
                       <span>中文</span>
-                      {focusLine.translation}
+                      <span className="assist-copy">{focusLine.translation}</span>
                     </p>
                   )}
                 </div>
@@ -641,7 +649,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="lyrics-window">
+            <div className="lyrics-window" ref={lyricsWindowRef}>
               {lyricLines.map((line, lineIndex) => {
                 const isPast = currentTime >= line.end;
                 const isCurrent = lineIndex === activeLineIndex;
