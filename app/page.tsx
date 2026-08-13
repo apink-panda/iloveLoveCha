@@ -8,7 +8,7 @@ const CHALLENGE_START = 88;
 const CHALLENGE_END = 119;
 const CHALLENGE_LENGTH = CHALLENGE_END - CHALLENGE_START;
 const DEFAULT_VOLUME = 82;
-const KARAOKE_MODE_ENABLED = false;
+const KARAOKE_MODE_ENABLED = true;
 
 type TimedWord = {
   text: string;
@@ -142,6 +142,9 @@ type YouTubePlayer = {
   getPlayerState: () => number;
   setPlaybackRate: (rate: number) => void;
   setVolume: (volume: number) => void;
+  mute: () => void;
+  unMute: () => void;
+  isMuted: () => boolean;
   destroy: () => void;
 };
 
@@ -155,7 +158,7 @@ declare global {
           playerVars: Record<string, number | string>;
           events: {
             onReady: (event: { target: YouTubePlayer }) => void;
-            onStateChange: (event: { data: number }) => void;
+            onStateChange: (event: { data: number; target: YouTubePlayer }) => void;
           };
         },
       ) => YouTubePlayer;
@@ -177,6 +180,7 @@ export default function Home() {
   const playerHostRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YouTubePlayer | null>(null);
   const karaokeAudioRef = useRef<HTMLAudioElement>(null);
+  const karaokePlayPendingRef = useRef(false);
   const phaseRef = useRef<Phase>("idle");
   const karaokeRef = useRef(false);
   const speedRef = useRef(1);
@@ -199,9 +203,11 @@ export default function Home() {
     const audio = new Audio("./pado-karaoke-hq-85-119.mp3");
     audio.preload = "auto";
     audio.volume = DEFAULT_VOLUME / 100;
+    audio.muted = true;
     karaokeAudioRef.current = audio;
 
     return () => {
+      karaokePlayPendingRef.current = false;
       audio.pause();
       audio.removeAttribute("src");
       audio.load();
@@ -225,16 +231,25 @@ export default function Home() {
       );
       audio.playbackRate = speedRef.current;
       audio.volume = volumeRef.current / 100;
+      audio.muted = false;
 
-      if (forceSeek || Math.abs(audio.currentTime - targetTime) > 0.16) {
+      if (forceSeek || Math.abs(audio.currentTime - targetTime) > 0.45) {
         audio.currentTime = targetTime;
       }
 
-      if (shouldPlay && audio.paused) {
-        void audio.play().catch(() => {
-          // A later user play action will retry if the browser blocks autoplay.
-        });
-      } else {
+      if (shouldPlay) {
+        if (audio.paused && !karaokePlayPendingRef.current) {
+          karaokePlayPendingRef.current = true;
+          void audio
+            .play()
+            .catch(() => {
+              // A later user play action will retry if the browser blocks autoplay.
+            })
+            .finally(() => {
+              karaokePlayPendingRef.current = false;
+            });
+        }
+      } else if (!audio.paused) {
         audio.pause();
       }
     },
@@ -243,13 +258,14 @@ export default function Home() {
 
   useEffect(() => {
     let disposed = false;
+    let pendingPlayer: YouTubePlayer | null = null;
 
     const createPlayer = () => {
       if (disposed || !window.YT || !playerHostRef.current || playerRef.current) {
         return;
       }
 
-      playerRef.current = new window.YT.Player(playerHostRef.current, {
+      pendingPlayer = new window.YT.Player(playerHostRef.current, {
         videoId: VIDEO_ID,
         playerVars: {
           autoplay: 0,
@@ -265,17 +281,36 @@ export default function Home() {
         },
         events: {
           onReady: ({ target }) => {
+            if (disposed) {
+              target.destroy();
+              return;
+            }
+
+            playerRef.current = target;
             target.cueVideoById({
               videoId: VIDEO_ID,
               startSeconds: COUNT_IN_START,
             });
             target.setVolume(DEFAULT_VOLUME);
+            target.unMute();
             setIsPlayerReady(true);
           },
-          onStateChange: ({ data }) => {
-            if (data === 1) setIsPaused(false);
-            if (data === 2) {
+          onStateChange: ({ data, target }) => {
+            if (disposed || !playerRef.current) return;
+
+            if (data === 1) {
+              setIsPaused(false);
+              if (karaokeRef.current) {
+                syncKaraokeAudio(target.getCurrentTime(), true, true);
+              }
+            }
+
+            if (data === 0 || data === 2 || data === 3) {
               karaokeAudioRef.current?.pause();
+              karaokePlayPendingRef.current = false;
+            }
+
+            if (data === 2) {
               if (phaseRef.current !== "finished") setIsPaused(true);
             }
           },
@@ -300,10 +335,10 @@ export default function Home() {
 
     return () => {
       disposed = true;
-      playerRef.current?.destroy();
+      (playerRef.current ?? pendingPlayer)?.destroy();
       playerRef.current = null;
     };
-  }, []); // The player is intentionally created only once.
+  }, [syncKaraokeAudio]); // The callback is stable, so the player is created once.
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -387,13 +422,22 @@ export default function Home() {
     const player = playerRef.current;
     if (!player) return;
     player.setPlaybackRate(speed);
-    player.setVolume(isKaraoke ? 0 : volume);
+    if (isKaraoke) {
+      player.mute();
+    } else {
+      player.unMute();
+      player.setVolume(volume);
+    }
     player.seekTo(COUNT_IN_START, true);
     player.playVideo();
     if (isKaraoke) {
       syncKaraokeAudio(COUNT_IN_START, true, true);
     } else {
-      karaokeAudioRef.current?.pause();
+      const karaokeAudio = karaokeAudioRef.current;
+      if (karaokeAudio) {
+        karaokeAudio.muted = true;
+        karaokeAudio.pause();
+      }
     }
     setCurrentTime(COUNT_IN_START);
     setPhase("countdown");
@@ -426,10 +470,20 @@ export default function Home() {
     const player = playerRef.current;
     if (!player) return;
     player.setPlaybackRate(speed);
-    player.setVolume(isKaraoke ? 0 : volume);
+    if (isKaraoke) {
+      player.mute();
+    } else {
+      player.unMute();
+      player.setVolume(volume);
+    }
     player.seekTo(lineStart, true);
     player.playVideo();
-    if (isKaraoke) syncKaraokeAudio(lineStart, true, true);
+    if (isKaraoke) {
+      syncKaraokeAudio(lineStart, true, true);
+    } else if (karaokeAudioRef.current) {
+      karaokeAudioRef.current.muted = true;
+      karaokeAudioRef.current.pause();
+    }
     setCurrentTime(lineStart);
     setPhase("singing");
     setIsPaused(false);
@@ -458,10 +512,14 @@ export default function Home() {
     setIsKaraoke(nextKaraoke);
 
     if (nextKaraoke) {
-      player?.setVolume(0);
+      player?.mute();
       syncKaraokeAudio(player?.getCurrentTime() ?? currentTime, isPlaying, true);
     } else {
-      karaokeAudioRef.current?.pause();
+      if (karaokeAudioRef.current) {
+        karaokeAudioRef.current.muted = true;
+        karaokeAudioRef.current.pause();
+      }
+      player?.unMute();
       player?.setVolume(volumeRef.current);
     }
   };
