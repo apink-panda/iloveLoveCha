@@ -175,7 +175,11 @@ function formatTime(seconds: number) {
 export default function Home() {
   const playerHostRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YouTubePlayer | null>(null);
+  const karaokeAudioRef = useRef<HTMLAudioElement>(null);
   const phaseRef = useRef<Phase>("idle");
+  const karaokeRef = useRef(false);
+  const speedRef = useRef(1);
+  const volumeRef = useRef(DEFAULT_VOLUME);
   const activeLineRef = useRef<HTMLButtonElement | null>(null);
   const lyricsWindowRef = useRef<HTMLDivElement | null>(null);
   const [isPlayerReady, setIsPlayerReady] = useState(false);
@@ -184,12 +188,55 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(COUNT_IN_START);
   const [speed, setSpeed] = useState(1);
   const [volume, setVolume] = useState(DEFAULT_VOLUME);
+  const [isKaraoke, setIsKaraoke] = useState(false);
   const [showKaraoke, setShowKaraoke] = useState(false);
   const [showTranslation, setShowTranslation] = useState(false);
 
   useEffect(() => {
+    const audio = new Audio("./pado-karaoke-85-119.mp3");
+    audio.preload = "auto";
+    audio.volume = DEFAULT_VOLUME / 100;
+    karaokeAudioRef.current = audio;
+
+    return () => {
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+      karaokeAudioRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
     phaseRef.current = phase;
   }, [phase]);
+
+  const syncKaraokeAudio = useCallback(
+    (videoTime: number, shouldPlay: boolean, forceSeek = false) => {
+      const audio = karaokeAudioRef.current;
+      if (!audio) return;
+
+      const targetTime = clamp(
+        videoTime - COUNT_IN_START,
+        0,
+        CHALLENGE_END - COUNT_IN_START,
+      );
+      audio.playbackRate = speedRef.current;
+      audio.volume = volumeRef.current / 100;
+
+      if (forceSeek || Math.abs(audio.currentTime - targetTime) > 0.16) {
+        audio.currentTime = targetTime;
+      }
+
+      if (shouldPlay && audio.paused) {
+        void audio.play().catch(() => {
+          // A later user play action will retry if the browser blocks autoplay.
+        });
+      } else {
+        audio.pause();
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     let disposed = false;
@@ -224,7 +271,10 @@ export default function Home() {
           },
           onStateChange: ({ data }) => {
             if (data === 1) setIsPaused(false);
-            if (data === 2 && phaseRef.current !== "finished") setIsPaused(true);
+            if (data === 2) {
+              karaokeAudioRef.current?.pause();
+              if (phaseRef.current !== "finished") setIsPaused(true);
+            }
           },
         },
       });
@@ -260,8 +310,13 @@ export default function Home() {
       const nextTime = player.getCurrentTime();
       setCurrentTime(nextTime);
 
+      if (karaokeRef.current) {
+        syncKaraokeAudio(nextTime, true);
+      }
+
       if (nextTime >= CHALLENGE_END - 0.08) {
         player.pauseVideo();
+        karaokeAudioRef.current?.pause();
         setCurrentTime(CHALLENGE_END);
         setPhase("finished");
         setIsPaused(false);
@@ -273,7 +328,7 @@ export default function Home() {
     }, 70);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [syncKaraokeAudio]);
 
   const elapsed = clamp(
     currentTime - CHALLENGE_START,
@@ -329,13 +384,18 @@ export default function Home() {
     const player = playerRef.current;
     if (!player) return;
     player.setPlaybackRate(speed);
-    player.setVolume(volume);
+    player.setVolume(isKaraoke ? 0 : volume);
     player.seekTo(COUNT_IN_START, true);
     player.playVideo();
+    if (isKaraoke) {
+      syncKaraokeAudio(COUNT_IN_START, true, true);
+    } else {
+      karaokeAudioRef.current?.pause();
+    }
     setCurrentTime(COUNT_IN_START);
     setPhase("countdown");
     setIsPaused(false);
-  }, [speed, volume]);
+  }, [isKaraoke, speed, syncKaraokeAudio, volume]);
 
   const togglePlayback = useCallback(() => {
     const player = playerRef.current;
@@ -350,19 +410,23 @@ export default function Home() {
       startChallenge();
     } else if (player.getPlayerState() === 1) {
       player.pauseVideo();
+      karaokeAudioRef.current?.pause();
       setIsPaused(true);
     } else {
       player.playVideo();
+      if (isKaraoke) syncKaraokeAudio(player.getCurrentTime(), true, true);
       setIsPaused(false);
     }
-  }, [isRunning, phase, startChallenge]);
+  }, [isKaraoke, isRunning, phase, startChallenge, syncKaraokeAudio]);
 
   const jumpToLine = (lineStart: number) => {
     const player = playerRef.current;
     if (!player) return;
     player.setPlaybackRate(speed);
+    player.setVolume(isKaraoke ? 0 : volume);
     player.seekTo(lineStart, true);
     player.playVideo();
+    if (isKaraoke) syncKaraokeAudio(lineStart, true, true);
     setCurrentTime(lineStart);
     setPhase("singing");
     setIsPaused(false);
@@ -370,12 +434,33 @@ export default function Home() {
 
   const changeSpeed = (nextSpeed: number) => {
     setSpeed(nextSpeed);
+    speedRef.current = nextSpeed;
     playerRef.current?.setPlaybackRate(nextSpeed);
+    if (karaokeAudioRef.current) karaokeAudioRef.current.playbackRate = nextSpeed;
   };
 
   const changeVolume = (nextVolume: number) => {
     setVolume(nextVolume);
-    playerRef.current?.setVolume(nextVolume);
+    volumeRef.current = nextVolume;
+    if (!isKaraoke) playerRef.current?.setVolume(nextVolume);
+    if (karaokeAudioRef.current) karaokeAudioRef.current.volume = nextVolume / 100;
+  };
+
+  const toggleKaraoke = () => {
+    const nextKaraoke = !isKaraoke;
+    const player = playerRef.current;
+    const isPlaying = player?.getPlayerState() === 1;
+
+    karaokeRef.current = nextKaraoke;
+    setIsKaraoke(nextKaraoke);
+
+    if (nextKaraoke) {
+      player?.setVolume(0);
+      syncKaraokeAudio(player?.getCurrentTime() ?? currentTime, isPlaying, true);
+    } else {
+      karaokeAudioRef.current?.pause();
+      player?.setVolume(volumeRef.current);
+    }
   };
 
   useEffect(() => {
@@ -567,6 +652,25 @@ export default function Home() {
                 />
               ))}
             </div>
+
+            <button
+              className={`karaoke-control ${isKaraoke ? "is-active" : ""}`}
+              type="button"
+              onClick={toggleKaraoke}
+              disabled={!isPlayerReady}
+              aria-pressed={isKaraoke}
+            >
+              <span className="karaoke-symbol" aria-hidden="true">
+                {isKaraoke ? "♫" : "♪"}
+              </span>
+              <span className="karaoke-copy">
+                <strong>{isKaraoke ? "卡拉版已開啟" : "開啟卡拉版"}</strong>
+                <small>{isKaraoke ? "MV 畫面保留 · 人聲已移除" : "切換為去人聲伴奏"}</small>
+              </span>
+              <span className="karaoke-switch" aria-hidden="true">
+                <i />
+              </span>
+            </button>
 
             <div className="player-controls">
               <button
