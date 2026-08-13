@@ -424,12 +424,112 @@ input:focus-visible {
   }
 }
 
+.focus-lyric {
+  position: relative;
+  min-height: 112px;
+  margin-top: 14px;
+  padding: 16px 17px 17px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 16px;
+  background:
+    linear-gradient(105deg, rgba(255, 117, 151, 0.1), transparent 48%),
+    rgba(255, 255, 255, 0.035);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.focus-lyric::after {
+  position: absolute;
+  right: -34px;
+  bottom: -55px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  content: "";
+  background: radial-gradient(circle, rgba(144, 117, 255, 0.2), transparent 68%);
+  pointer-events: none;
+}
+
+.focus-lyric.is-singing {
+  border-color: rgba(255, 117, 151, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 12px 28px rgba(255, 79, 130, 0.08);
+}
+
+.focus-lyric-meta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  color: var(--pink);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.focus-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pink);
+  box-shadow: 0 0 0 4px rgba(255, 117, 151, 0.11);
+}
+
+.focus-lyric.is-singing .focus-pulse {
+  animation: focus-pulse 900ms ease-in-out infinite alternate;
+}
+
+@keyframes focus-pulse {
+  to {
+    box-shadow: 0 0 0 7px rgba(255, 117, 151, 0.05), 0 0 14px var(--pink);
+    transform: scale(1.15);
+  }
+}
+
+.focus-wait {
+  margin-left: auto;
+  color: #777a94;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.focus-lyric-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.3em;
+  align-content: center;
+  min-height: 50px;
+  margin: 9px 0 0;
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 760;
+  letter-spacing: -0.04em;
+  line-height: 1.25;
+}
+
+.focus-lyric-copy span {
+  background: linear-gradient(
+    90deg,
+    var(--pearl) 0 var(--word-progress),
+    rgba(171, 172, 194, 0.38) var(--word-progress) 100%
+  );
+  background-clip: text;
+  color: transparent;
+}
+
+.focus-lyric.is-singing .focus-lyric-copy span {
+  filter: drop-shadow(0 0 9px rgba(255, 117, 151, 0.16));
+}
+
 .wave-meter {
   display: flex;
   align-items: center;
   gap: 3px;
   height: 42px;
-  margin: 17px 0 13px;
+  margin: 10px 0 11px;
   opacity: 0.9;
   mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
 }
@@ -916,7 +1016,18 @@ input:focus-visible {
 
   .wave-meter {
     height: 32px;
-    margin-block: 12px 9px;
+    margin-block: 9px 8px;
+  }
+
+  .focus-lyric {
+    min-height: 104px;
+    margin-top: 12px;
+    padding: 14px 15px;
+  }
+
+  .focus-lyric-copy {
+    min-height: 46px;
+    font-size: clamp(20px, 6vw, 27px);
   }
 
   .source-link,

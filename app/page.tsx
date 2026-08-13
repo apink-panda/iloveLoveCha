@@ -174,6 +174,30 @@ export default function Home() {
       ),
     [currentTime],
   );
+  const activeLine =
+    activeLineIndex >= 0 ? lyricLines[activeLineIndex] : undefined;
+  const nextLine = lyricLines.find((line) => line.start > currentTime);
+  const focusLine =
+    activeLine ??
+    (phase === "finished" ? lyricLines[lyricLines.length - 1] : nextLine) ??
+    lyricLines[0];
+  const focusLineProgress = activeLine
+    ? clamp(
+        (currentTime - activeLine.start) / (activeLine.end - activeLine.start),
+      )
+    : phase === "finished"
+      ? 1
+      : 0;
+  const focusWords = focusLine.text.split(" ");
+  const focusLabel = activeLine
+    ? "NOW · 現在唱"
+    : phase === "finished"
+      ? "COMPLETE · 完成"
+      : phase === "idle"
+        ? "FIRST LINE · 第一句"
+        : phase === "countdown"
+          ? "GET READY · 準備"
+          : "NEXT · 下一句";
   const countIn = Math.max(1, Math.ceil(CHALLENGE_START - currentTime));
   const isRunning = phase === "countdown" || phase === "singing";
 
@@ -327,6 +351,41 @@ export default function Home() {
                 )}
               </div>
               <span className="clip-badge">01:28 → 01:59</span>
+            </div>
+
+            <div
+              className={`focus-lyric ${activeLine ? "is-singing" : "is-preview"}`}
+              aria-live="polite"
+              aria-label={`${focusLabel}：${focusLine.text}`}
+            >
+              <div className="focus-lyric-meta">
+                <span className="focus-pulse" aria-hidden="true" />
+                <span>{focusLabel}</span>
+                {!activeLine && nextLine && phase === "singing" && (
+                  <span className="focus-wait">
+                    {Math.max(0, nextLine.start - currentTime).toFixed(1)}s
+                  </span>
+                )}
+              </div>
+              <p className="focus-lyric-copy" lang="ko">
+                {focusWords.map((word, wordIndex) => {
+                  const wordProgress = clamp(
+                    focusLineProgress * focusWords.length - wordIndex,
+                  );
+                  return (
+                    <span
+                      key={`${focusLine.text}-focus-${wordIndex}`}
+                      style={
+                        {
+                          "--word-progress": `${wordProgress * 100}%`,
+                        } as React.CSSProperties
+                      }
+                    >
+                      {word}
+                    </span>
+                  );
+                })}
+              </p>
             </div>
 
             <div className="wave-meter" aria-hidden="true">
