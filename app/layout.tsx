@@ -16,21 +16,21 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: baseUrl,
-    title: "파도 (i love LOVE) · 31 秒跟唱挑戰",
+    title: "파도 i love LOVE Vocal Challenge",
     description: "跟著 01:28–01:59 的同步歌詞，一起完成 31 秒跟唱練習。",
     icons: {
       icon: "/icon.png",
       apple: "/icon.png",
     },
     openGraph: {
-      title: "파도 (i love LOVE) · SING CHALLENGE",
+      title: "파도 i love LOVE Vocal Challenge",
       description: "戴上耳機，跟著亮起的歌詞完成 31 秒跟唱挑戰。",
       images: [{ url: socialImage, width: 1200, height: 630 }],
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: "파도 (i love LOVE) · SING CHALLENGE",
+      title: "파도 i love LOVE Vocal Challenge",
       description: "31 秒，跟著浪唱進愛裡。",
       images: [socialImage],
     },

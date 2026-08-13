@@ -402,7 +402,7 @@ export default function Home() {
           <span className="brand-mark" aria-hidden="true">
             J
           </span>
-          <span>파도 (i love LOVE)</span>
+          <span>파도 i love LOVE Vocal Challenge</span>
         </a>
         <div className="session-label">
           <span className="live-dot" />
@@ -412,7 +412,7 @@ export default function Home() {
 
       <section className="intro" aria-labelledby="page-title">
         <div>
-          <p className="eyebrow">SING CHALLENGE · 01:28—01:59</p>
+          <p className="eyebrow">VOCAL CHALLENGE · 01:28—01:59</p>
           <h1 id="page-title">
             跟著浪，<span>唱進愛裡。</span>
           </h1>
@@ -429,7 +429,7 @@ export default function Home() {
           </div>
           <div>
             <p className="meta-label">TODAY&apos;S VERSE</p>
-            <p className="meta-title">파도 (i love LOVE) · Chorus challenge</p>
+            <p className="meta-title">파도 i love LOVE Vocal Challenge</p>
           </div>
           <div className="timecode">
             <span>{formatTime(elapsed)}</span>
