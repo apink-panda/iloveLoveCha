@@ -193,7 +193,7 @@ export default function Home() {
   const [showTranslation, setShowTranslation] = useState(false);
 
   useEffect(() => {
-    const audio = new Audio("./pado-karaoke-85-119.mp3");
+    const audio = new Audio("./pado-karaoke-hq-85-119.mp3");
     audio.preload = "auto";
     audio.volume = DEFAULT_VOLUME / 100;
     karaokeAudioRef.current = audio;
@@ -665,7 +665,7 @@ export default function Home() {
               </span>
               <span className="karaoke-copy">
                 <strong>{isKaraoke ? "卡拉版已開啟" : "開啟卡拉版"}</strong>
-                <small>{isKaraoke ? "MV 畫面保留 · 人聲已移除" : "切換為去人聲伴奏"}</small>
+                <small>{isKaraoke ? "MV 畫面保留 · 高品質去人聲伴奏" : "切換為高品質去人聲伴奏"}</small>
               </span>
               <span className="karaoke-switch" aria-hidden="true">
                 <i />
