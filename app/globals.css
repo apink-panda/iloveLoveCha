@@ -296,6 +296,83 @@ input:focus-visible {
   transition: width 80ms linear;
 }
 
+.assist-controls {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  padding: 11px 28px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(7, 8, 25, 0.38);
+}
+
+.assist-label {
+  margin-right: auto;
+  color: #777a96;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.assist-controls button {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 7px 11px 7px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 11px;
+  color: #a7a9bd;
+  background: rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 180ms ease, color 180ms ease, background 180ms ease;
+}
+
+.assist-controls button > span:first-child {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 8px;
+  color: #9c9fb7;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.assist-controls button > span:last-child {
+  display: grid;
+  gap: 1px;
+}
+
+.assist-controls strong {
+  color: inherit;
+  font-size: 11px;
+  line-height: 1.1;
+}
+
+.assist-controls small {
+  color: #686b82;
+  font-size: 8px;
+  line-height: 1.1;
+}
+
+.assist-controls button:hover {
+  border-color: rgba(255, 117, 151, 0.28);
+  color: var(--pearl);
+}
+
+.assist-controls button.is-active {
+  border-color: rgba(255, 117, 151, 0.36);
+  color: var(--pearl);
+  background: linear-gradient(110deg, rgba(255, 117, 151, 0.16), rgba(144, 117, 255, 0.1));
+}
+
+.assist-controls button.is-active > span:first-child {
+  color: white;
+  background: linear-gradient(135deg, var(--pink), var(--violet));
+  box-shadow: 0 0 15px rgba(255, 117, 151, 0.22);
+}
+
 .challenge-grid {
   display: grid;
   grid-template-columns: minmax(300px, 0.73fr) minmax(500px, 1.4fr);
@@ -528,6 +605,38 @@ input:focus-visible {
 
 .focus-lyric.is-singing .focus-unit {
   filter: drop-shadow(0 0 9px rgba(255, 117, 151, 0.16));
+}
+
+.focus-assists {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 5px;
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.focus-assists p {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin: 0;
+  color: #c9cada;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.focus-assists p > span {
+  flex: 0 0 auto;
+  color: var(--violet-soft);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.focus-assists .assist-translation {
+  color: #999cb2;
 }
 
 .wave-meter {
@@ -821,6 +930,12 @@ input:focus-visible {
   text-align: right;
 }
 
+.line-content {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
 .line-copy {
   display: flex;
   min-width: 0;
@@ -831,6 +946,22 @@ input:focus-visible {
   font-weight: 660;
   letter-spacing: -0.035em;
   line-height: 1.28;
+}
+
+.line-assist {
+  color: #8f92aa;
+  font-size: 11px;
+  font-weight: 560;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+}
+
+.line-karaoke {
+  color: #b8a9ef;
+}
+
+.line-translation {
+  color: #80839a;
 }
 
 .lyric-line.is-current .line-copy {
@@ -1010,6 +1141,22 @@ input:focus-visible {
     margin-top: -8px;
   }
 
+  .assist-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 11px 18px 13px;
+  }
+
+  .assist-label {
+    grid-column: 1 / -1;
+    margin: 0 0 1px;
+  }
+
+  .assist-controls button {
+    width: 100%;
+    padding-right: 8px;
+  }
+
   .challenge-grid {
     grid-template-columns: 1fr;
   }
@@ -1058,6 +1205,10 @@ input:focus-visible {
   .line-copy,
   .lyric-line.is-current .line-copy {
     font-size: clamp(18px, 5vw, 24px);
+  }
+
+  .line-assist {
+    font-size: 12px;
   }
 
   .finish-toast {

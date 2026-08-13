@@ -20,25 +20,37 @@ type LyricLine = {
   end: number;
   text: string;
   words: TimedWord[];
+  karaoke?: string;
+  translation?: string;
 };
 
-function makeLine(words: TimedWord[]): LyricLine {
+function makeLine(
+  words: TimedWord[],
+  annotations: Pick<LyricLine, "karaoke" | "translation"> = {},
+): LyricLine {
   return {
     start: words[0].start,
     end: words[words.length - 1].end,
     text: words.map((word) => word.text).join(" "),
     words,
+    ...annotations,
   };
 }
 
 const lyricLines = [
-  makeLine([
-    { text: "멀어져도", start: 88.6, end: 89.74 },
-    { text: "다시", start: 89.74, end: 90.18 },
-    { text: "내게", start: 90.18, end: 90.78 },
-    { text: "돌아오는", start: 90.78, end: 92.18 },
-    { text: "물결처럼", start: 92.18, end: 93.18 },
-  ]),
+  makeLine(
+    [
+      { text: "멀어져도", start: 88.6, end: 89.74 },
+      { text: "다시", start: 89.74, end: 90.18 },
+      { text: "내게", start: 90.18, end: 90.78 },
+      { text: "돌아오는", start: 90.78, end: 92.18 },
+      { text: "물결처럼", start: 92.18, end: 93.18 },
+    ],
+    {
+      karaoke: "摸摟就都　塔西　內給　偷拉歐嫩　木勾秋龍",
+      translation: "即使遠去，也會像浪潮般再次回到我身邊",
+    },
+  ),
   makeLine([
     { text: "You", start: 93.18, end: 93.72 },
     { text: "always", start: 93.72, end: 94.5 },
@@ -46,36 +58,57 @@ const lyricLines = [
     { text: "me", start: 95, end: 95.36 },
     { text: "again", start: 95.36, end: 96.12 },
   ]),
-  makeLine([
-    { text: "더", start: 96.12, end: 96.96 },
-    { text: "깊이", start: 96.96, end: 97.56 },
-    { text: "네게로", start: 97.56, end: 98.62 },
-    { text: "가", start: 98.62, end: 99.3 },
-    { text: "Just", start: 99.3, end: 100.04 },
-    { text: "Dive", start: 100.04, end: 100.88 },
-  ]),
-  makeLine([
-    { text: "손", start: 100.88, end: 101.26 },
-    { text: "닿지", start: 101.26, end: 101.76 },
-    { text: "않아", start: 101.76, end: 102.34 },
-    { text: "멀어져도", start: 102.34, end: 103.74 },
-    { text: "난", start: 103.74, end: 104.28 },
-    { text: "Just", start: 104.28, end: 105 },
-    { text: "Love", start: 105, end: 105.6 },
-  ]),
-  makeLine([
-    { text: "보이지", start: 105.6, end: 106.72 },
-    { text: "않는", start: 106.72, end: 107.44 },
-  ]),
-  makeLine([
-    { text: "깊은", start: 107.44, end: 108.88 },
-    { text: "바닷속", start: 108.88, end: 109.74 },
-    { text: "어둠", start: 109.74, end: 110.74 },
-  ]),
-  makeLine([
-    { text: "요동치는", start: 110.74, end: 112.14 },
-    { text: "일렁임까지", start: 112.14, end: 114.06 },
-  ]),
+  makeLine(
+    [
+      { text: "더", start: 96.12, end: 96.96 },
+      { text: "깊이", start: 96.96, end: 97.56 },
+      { text: "네게로", start: 97.56, end: 98.62 },
+      { text: "가", start: 98.62, end: 99.3 },
+      { text: "Just", start: 99.3, end: 100.04 },
+      { text: "Dive", start: 100.04, end: 100.88 },
+    ],
+    {
+      karaoke: "偷　基皮　內給摟　卡",
+      translation: "更深地向你靠近",
+    },
+  ),
+  makeLine(
+    [
+      { text: "손", start: 100.88, end: 101.26 },
+      { text: "닿지", start: 101.26, end: 101.76 },
+      { text: "않아", start: 101.76, end: 102.34 },
+      { text: "멀어져도", start: 102.34, end: 103.74 },
+      { text: "난", start: 103.74, end: 104.28 },
+      { text: "Just", start: 104.28, end: 105 },
+      { text: "Love", start: 105, end: 105.6 },
+    ],
+    {
+      karaoke: "松　塔七　阿那　摸摟就都　南",
+      translation: "即使伸手觸不到、漸行漸遠，我依然 — Just Love",
+    },
+  ),
+  makeLine(
+    [
+      { text: "보이지", start: 105.6, end: 106.72 },
+      { text: "않는", start: 106.72, end: 107.44 },
+    ],
+    { karaoke: "波一基　安嫩", translation: "看不見的" },
+  ),
+  makeLine(
+    [
+      { text: "깊은", start: 107.44, end: 108.88 },
+      { text: "바닷속", start: 108.88, end: 109.74 },
+      { text: "어둠", start: 109.74, end: 110.74 },
+    ],
+    { karaoke: "基噴　趴搭搜　歐敦", translation: "深邃海底的黑暗" },
+  ),
+  makeLine(
+    [
+      { text: "요동치는", start: 110.74, end: 112.14 },
+      { text: "일렁임까지", start: 112.14, end: 114.06 },
+    ],
+    { karaoke: "優東七嫩　一摟因嘎基", translation: "連同翻湧的波動" },
+  ),
   makeLine([
     { text: "Oh", start: 115, end: 115.14 },
     { text: "I", start: 115.14, end: 115.62 },
@@ -150,6 +183,8 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(COUNT_IN_START);
   const [speed, setSpeed] = useState(1);
   const [volume, setVolume] = useState(DEFAULT_VOLUME);
+  const [showKaraoke, setShowKaraoke] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(false);
 
   useEffect(() => {
     phaseRef.current = phase;
@@ -399,6 +434,34 @@ export default function Home() {
           <div className="progress-fill" style={{ width: `${progress * 100}%` }} />
         </div>
 
+        <div className="assist-controls" aria-label="歌詞輔助模式">
+          <span className="assist-label">歌詞輔助</span>
+          <button
+            type="button"
+            className={showKaraoke ? "is-active" : ""}
+            onClick={() => setShowKaraoke((value) => !value)}
+            aria-pressed={showKaraoke}
+          >
+            <span aria-hidden="true">音</span>
+            <span>
+              <strong>空耳模式</strong>
+              <small>中文近似讀音</small>
+            </span>
+          </button>
+          <button
+            type="button"
+            className={showTranslation ? "is-active" : ""}
+            onClick={() => setShowTranslation((value) => !value)}
+            aria-pressed={showTranslation}
+          >
+            <span aria-hidden="true">中</span>
+            <span>
+              <strong>中文翻譯</strong>
+              <small>僅翻譯韓文</small>
+            </span>
+          </button>
+        </div>
+
         <div className="challenge-grid">
           <aside className="player-panel" aria-label="歌曲播放器">
             <div className="video-frame">
@@ -466,6 +529,23 @@ export default function Home() {
                   );
                 })}
               </p>
+              {(showKaraoke && focusLine.karaoke) ||
+              (showTranslation && focusLine.translation) ? (
+                <div className="focus-assists">
+                  {showKaraoke && focusLine.karaoke && (
+                    <p className="assist-karaoke">
+                      <span>空耳</span>
+                      {focusLine.karaoke}
+                    </p>
+                  )}
+                  {showTranslation && focusLine.translation && (
+                    <p className="assist-translation">
+                      <span>中文</span>
+                      {focusLine.translation}
+                    </p>
+                  )}
+                </div>
+              ) : null}
             </div>
 
             <div className="wave-meter" aria-hidden="true">
@@ -579,32 +659,40 @@ export default function Home() {
                     <span className="line-number">
                       {(lineIndex + 1).toString().padStart(2, "0")}
                     </span>
-                    <span className="line-copy" lang="ko">
-                      {line.words.map((word, wordIndex) => {
-                        const units = getTimedUnits(word);
-                        return (
-                          <span className="timed-word" key={`${line.text}-${wordIndex}`}>
-                            {units.map((unit, unitIndex) => {
-                              const unitProgress = clamp(
-                                (currentTime - unit.start) / (unit.end - unit.start),
-                              );
-                              return (
-                                <span
-                                  className="lyric-word"
-                                  key={`${word.text}-${unitIndex}`}
-                                  style={
-                                    {
-                                      "--word-progress": `${unitProgress * 100}%`,
-                                    } as React.CSSProperties
-                                  }
-                                >
-                                  {unit.text}
-                                </span>
-                              );
-                            })}
-                          </span>
-                        );
-                      })}
+                    <span className="line-content">
+                      <span className="line-copy" lang="ko">
+                        {line.words.map((word, wordIndex) => {
+                          const units = getTimedUnits(word);
+                          return (
+                            <span className="timed-word" key={`${line.text}-${wordIndex}`}>
+                              {units.map((unit, unitIndex) => {
+                                const unitProgress = clamp(
+                                  (currentTime - unit.start) / (unit.end - unit.start),
+                                );
+                                return (
+                                  <span
+                                    className="lyric-word"
+                                    key={`${word.text}-${unitIndex}`}
+                                    style={
+                                      {
+                                        "--word-progress": `${unitProgress * 100}%`,
+                                      } as React.CSSProperties
+                                    }
+                                  >
+                                    {unit.text}
+                                  </span>
+                                );
+                              })}
+                            </span>
+                          );
+                        })}
+                      </span>
+                      {showKaraoke && line.karaoke && (
+                        <span className="line-assist line-karaoke">{line.karaoke}</span>
+                      )}
+                      {showTranslation && line.translation && (
+                        <span className="line-assist line-translation">{line.translation}</span>
+                      )}
                     </span>
                     <span className="line-time">
                       {formatTime(line.start - CHALLENGE_START)}
