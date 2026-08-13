@@ -579,7 +579,8 @@ input:focus-visible {
   flex-wrap: wrap;
   gap: 0 0.3em;
   align-content: center;
-  min-height: 50px;
+  height: 2.5em;
+  min-height: 2.5em;
   margin: 9px 0 0;
   font-size: clamp(20px, 2vw, 28px);
   font-weight: 760;
@@ -1179,7 +1180,8 @@ input:focus-visible {
   }
 
   .focus-lyric-copy {
-    min-height: 46px;
+    height: 2.5em;
+    min-height: 2.5em;
     font-size: clamp(20px, 6vw, 27px);
   }
 
