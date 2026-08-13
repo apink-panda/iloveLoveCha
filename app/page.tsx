@@ -11,12 +11,12 @@ const DEFAULT_VOLUME = 82;
 
 const lyricLines = [
   { start: 88, end: 93.1, text: "멀어져도 다시 내게 돌아오는 물결처럼" },
-  { start: 93.1, end: 95.1, text: "You always save me again" },
-  { start: 95.1, end: 98.95, text: "더 깊이 네게로 가 Just Dive" },
-  { start: 98.95, end: 103.05, text: "손 닿지 않아 멀어져도 난 Just Love" },
-  { start: 103.05, end: 107.95, text: "보이지 않는 깊은 바닷속" },
-  { start: 107.95, end: 113.15, text: "어둠 요동치는 일렁임까지" },
-  { start: 113.15, end: 119, text: "Oh I I love ‘LOVE’ ‘LOVE’" },
+  { start: 93.1, end: 96, text: "You always save me again" },
+  { start: 96.5, end: 100, text: "더 깊이 네게로 가 Just Dive" },
+  { start: 101, end: 105, text: "손 닿지 않아 멀어져도 난 Just Love" },
+  { start: 105, end: 109, text: "보이지 않는 깊은 바닷속" },
+  { start: 109, end: 114, text: "어둠 요동치는 일렁임까지" },
+  { start: 114, end: 119, text: "Oh I I love ‘LOVE’ ‘LOVE’" },
 ] as const;
 
 type Phase = "idle" | "countdown" | "singing" | "finished";
