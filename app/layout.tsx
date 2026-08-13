@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
     requestHeaders.get("x-forwarded-proto") ??
     (host.startsWith("localhost") ? "http" : "https");
   const baseUrl = new URL(`${protocol}://${host}`);
-  const socialImage = new URL("/pado-love-wave.png", baseUrl).toString();
+  const socialImage = new URL("/pado-vocal-challenge-v2.png", baseUrl).toString();
 
   return {
     metadataBase: baseUrl,
@@ -25,7 +25,15 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: "파도 i love LOVE Vocal Challenge",
       description: "戴上耳機，跟著亮起的歌詞完成 31 秒跟唱挑戰。",
-      images: [{ url: socialImage, width: 1200, height: 630 }],
+      images: [
+        {
+          url: socialImage,
+          width: 1200,
+          height: 630,
+          type: "image/png",
+          alt: "파도 i love LOVE Vocal Challenge",
+        },
+      ],
       type: "website",
     },
     twitter: {
