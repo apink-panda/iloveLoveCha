@@ -4,11 +4,11 @@
 
 ## GitHub Pages
 
-網站由 GitHub Actions 自動部署：
+網站由 GitHub Pages 自動發布：
 
-<https://apink-panda.github.io/iloveLoveCha/>
+<https://apink-panda.com/iloveLoveCha/>
 
-每次推送至 `main` 分支後，工作流程會自動發布網站。
+每次推送至 `main` 分支後，GitHub Pages 會自動發布根目錄中的靜態網站。
 
 ## 本機開發
 
@@ -23,4 +23,4 @@ GitHub Pages 靜態版本：
 npm run build:pages
 ```
 
-更新網站時，請在提交前執行 `npm run build:pages`，並一起提交產生的 `dist-pages`。
+更新網站時，請在提交前執行 `npm run build:pages`，再將 `dist-pages` 的內容同步至專案根目錄。
