@@ -8,7 +8,7 @@
 
 <https://apink-panda.github.io/iloveLoveCha/>
 
-每次推送至 `main` 分支後，工作流程會重新建置並發布網站。
+每次推送至 `main` 分支後，工作流程會自動發布網站。
 
 ## 本機開發
 
@@ -22,3 +22,5 @@ GitHub Pages 靜態版本：
 ```bash
 npm run build:pages
 ```
+
+更新網站時，請在提交前執行 `npm run build:pages`，並一起提交產生的 `dist-pages`。
