@@ -187,10 +187,10 @@ input:focus-visible {
 .intro h1 {
   margin: 0;
   max-width: 850px;
-  font-size: clamp(42px, 5.2vw, 78px);
-  font-weight: 820;
-  letter-spacing: -0.07em;
-  line-height: 0.98;
+  font-size: clamp(28px, 3.2vw, 42px);
+  font-weight: 760;
+  letter-spacing: -0.045em;
+  line-height: 1.15;
 }
 
 .intro h1 span {
@@ -1156,7 +1156,7 @@ input:focus-visible {
   }
 
   .intro h1 {
-    font-size: clamp(43px, 13vw, 68px);
+    font-size: clamp(28px, 8vw, 34px);
   }
 
   .intro-copy {
