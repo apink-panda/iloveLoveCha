@@ -69,7 +69,7 @@ const lyricLines = [
       { text: "Dive", start: 100.04, end: 100.88 },
     ],
     {
-      karaoke: "偷　基皮　內給摟　卡",
+      karaoke: "偷　基皮　內給摟　卡　Just Dive",
       translation: "更深地向你靠近",
     },
   ),
@@ -84,7 +84,7 @@ const lyricLines = [
       { text: "Love", start: 105, end: 105.6 },
     ],
     {
-      karaoke: "松　塔七　阿那　摸摟就都　南",
+      karaoke: "松　塔七　阿那　摸摟就都　南　Just Love",
       translation: "即使伸手觸不到、漸行漸遠，我依然 — Just Love",
     },
   ),
@@ -101,14 +101,14 @@ const lyricLines = [
       { text: "바닷속", start: 108.88, end: 109.74 },
       { text: "어둠", start: 109.74, end: 110.74 },
     ],
-    { karaoke: "基噴　趴搭搜　歐敦", translation: "深邃海底的黑暗" },
+    { karaoke: "基噴　趴搭搜勾敦", translation: "深邃海底的黑暗" },
   ),
   makeLine(
     [
       { text: "요동치는", start: 110.74, end: 112.14 },
       { text: "일렁임까지", start: 112.14, end: 114.06 },
     ],
-    { karaoke: "優東七嫩　一摟因嘎基", translation: "連同翻湧的波動" },
+    { karaoke: "優東七呢尼冷因嘎基", translation: "連同翻湧的波動" },
   ),
   makeLine([
     { text: "Oh", start: 115, end: 115.14 },
