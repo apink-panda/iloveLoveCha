@@ -1087,6 +1087,39 @@ input:focus-visible {
   color: #b8a9ef;
 }
 
+.timed-karaoke-text {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.timed-karaoke-word {
+  display: inline-flex;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.timed-karaoke-word:not(:first-child):not(.is-linked) {
+  margin-left: 0.42em;
+}
+
+.karaoke-unit {
+  background: linear-gradient(
+    90deg,
+    #ddd3ff 0 var(--word-progress),
+    rgba(140, 132, 177, 0.38) var(--word-progress) 100%
+  );
+  background-clip: text;
+  color: transparent;
+  transition: filter 120ms linear;
+}
+
+.focus-lyric.is-singing .karaoke-unit,
+.lyric-line.is-current .karaoke-unit {
+  filter: drop-shadow(0 0 8px rgba(166, 138, 255, 0.22));
+}
+
 .line-translation {
   color: #80839a;
 }

@@ -16,12 +16,17 @@ type TimedWord = {
   end: number;
 };
 
+type KaraokeToken = {
+  text: string;
+  joinBefore?: boolean;
+};
+
 type LyricLine = {
   start: number;
   end: number;
   text: string;
   words: TimedWord[];
-  karaoke?: string;
+  karaoke?: KaraokeToken[];
   translation?: string;
 };
 
@@ -48,7 +53,13 @@ const lyricLines = [
       { text: "물결처럼", start: 92.18, end: 93.18 },
     ],
     {
-      karaoke: "摸摟就都　塔西　內給　偷拉歐嫩　木勾秋龍",
+      karaoke: [
+        { text: "摸摟就都" },
+        { text: "塔西" },
+        { text: "內給" },
+        { text: "偷拉歐嫩" },
+        { text: "木勾秋龍" },
+      ],
       translation: "即使遠去，也會像浪潮般再次回到我身邊",
     },
   ),
@@ -69,7 +80,14 @@ const lyricLines = [
       { text: "Dive", start: 100.04, end: 100.88 },
     ],
     {
-      karaoke: "偷　基皮　內給摟　卡　Just Dive",
+      karaoke: [
+        { text: "偷" },
+        { text: "基皮" },
+        { text: "內給摟" },
+        { text: "卡" },
+        { text: "Just" },
+        { text: "Dive" },
+      ],
       translation: "更深地向你靠近",
     },
   ),
@@ -84,7 +102,15 @@ const lyricLines = [
       { text: "Love", start: 105, end: 105.6 },
     ],
     {
-      karaoke: "松　塔七　阿那　摸摟就都　南　Just Love",
+      karaoke: [
+        { text: "松" },
+        { text: "塔七" },
+        { text: "阿那" },
+        { text: "摸摟就都" },
+        { text: "南" },
+        { text: "Just" },
+        { text: "Love" },
+      ],
       translation: "即使伸手觸不到、漸行漸遠，我依然 — Just Love",
     },
   ),
@@ -93,7 +119,10 @@ const lyricLines = [
       { text: "보이지", start: 105.6, end: 106.72 },
       { text: "않는", start: 106.72, end: 107.44 },
     ],
-    { karaoke: "波一基　安嫩", translation: "看不見的" },
+    {
+      karaoke: [{ text: "波一基" }, { text: "安嫩" }],
+      translation: "看不見的",
+    },
   ),
   makeLine(
     [
@@ -101,14 +130,27 @@ const lyricLines = [
       { text: "바닷속", start: 108.88, end: 109.74 },
       { text: "어둠", start: 109.74, end: 110.74 },
     ],
-    { karaoke: "基噴　趴搭搜勾敦", translation: "深邃海底的黑暗" },
+    {
+      karaoke: [
+        { text: "基噴" },
+        { text: "趴搭搜" },
+        { text: "勾敦", joinBefore: true },
+      ],
+      translation: "深邃海底的黑暗",
+    },
   ),
   makeLine(
     [
       { text: "요동치는", start: 110.74, end: 112.14 },
       { text: "일렁임까지", start: 112.14, end: 114.06 },
     ],
-    { karaoke: "優東七呢尼冷因嘎基", translation: "連同翻湧的波動" },
+    {
+      karaoke: [
+        { text: "優東七呢" },
+        { text: "尼冷因嘎基", joinBefore: true },
+      ],
+      translation: "連同翻湧的波動",
+    },
   ),
   makeLine([
     { text: "Oh", start: 115, end: 115.14 },
@@ -129,6 +171,75 @@ function getTimedUnits(word: TimedWord) {
     start: word.start + unitDuration * index,
     end: word.start + unitDuration * (index + 1),
   }));
+}
+
+function getTimedKaraokeUnits(word: TimedWord, token: KaraokeToken) {
+  const parts = /^[가-힣]+$/.test(word.text) ? Array.from(token.text) : [token.text];
+  const unitDuration = (word.end - word.start) / parts.length;
+
+  return parts.map((text, index) => ({
+    text,
+    start: word.start + unitDuration * index,
+    end: word.start + unitDuration * (index + 1),
+  }));
+}
+
+function getKaraokeLabel(tokens: KaraokeToken[]) {
+  return tokens
+    .map((token, index) => `${index > 0 && !token.joinBefore ? " " : ""}${token.text}`)
+    .join("");
+}
+
+function TimedKaraokeText({
+  line,
+  currentTime,
+  className,
+}: {
+  line: LyricLine;
+  currentTime: number;
+  className: string;
+}) {
+  if (!line.karaoke) return null;
+
+  return (
+    <span
+      className={`${className} timed-karaoke-text`}
+      lang="zh-Hant"
+      aria-label={getKaraokeLabel(line.karaoke)}
+    >
+      {line.karaoke.map((token, tokenIndex) => {
+        const sourceWord = line.words[tokenIndex];
+        if (!sourceWord) return token.text;
+
+        const units = getTimedKaraokeUnits(sourceWord, token);
+        return (
+          <span
+            className={`timed-karaoke-word ${token.joinBefore ? "is-linked" : ""}`}
+            key={`${line.text}-karaoke-${tokenIndex}`}
+          >
+            {units.map((unit, unitIndex) => {
+              const unitProgress = clamp(
+                (currentTime - unit.start) / (unit.end - unit.start),
+              );
+              return (
+                <span
+                  className="karaoke-unit"
+                  key={`${token.text}-${unitIndex}`}
+                  style={
+                    {
+                      "--word-progress": `${unitProgress * 100}%`,
+                    } as React.CSSProperties
+                  }
+                >
+                  {unit.text}
+                </span>
+              );
+            })}
+          </span>
+        );
+      })}
+    </span>
+  );
 }
 
 type Phase = "idle" | "countdown" | "singing" | "finished";
@@ -689,7 +800,11 @@ export default function Home() {
                   {showKaraoke && focusLine.karaoke && (
                     <p className="assist-karaoke">
                       <span>空耳</span>
-                      <span className="assist-copy">{focusLine.karaoke}</span>
+                      <TimedKaraokeText
+                        line={focusLine}
+                        currentTime={currentTime}
+                        className="assist-copy"
+                      />
                     </p>
                   )}
                   {showTranslation && focusLine.translation && (
@@ -866,7 +981,11 @@ export default function Home() {
                         })}
                       </span>
                       {showKaraoke && line.karaoke && (
-                        <span className="line-assist line-karaoke">{line.karaoke}</span>
+                        <TimedKaraokeText
+                          line={line}
+                          currentTime={currentTime}
+                          className="line-assist line-karaoke"
+                        />
                       )}
                       {showTranslation && line.translation && (
                         <span className="line-assist line-translation">{line.translation}</span>
