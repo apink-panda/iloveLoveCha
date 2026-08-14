@@ -63,13 +63,24 @@ const lyricLines = [
       translation: "即使遠去，也會像浪潮般再次回到我身邊",
     },
   ),
-  makeLine([
-    { text: "You", start: 93.18, end: 93.72 },
-    { text: "always", start: 93.72, end: 94.5 },
-    { text: "save", start: 94.5, end: 95 },
-    { text: "me", start: 95, end: 95.36 },
-    { text: "again", start: 95.36, end: 96.12 },
-  ]),
+  makeLine(
+    [
+      { text: "You", start: 93.18, end: 93.72 },
+      { text: "always", start: 93.72, end: 94.5 },
+      { text: "save", start: 94.5, end: 95 },
+      { text: "me", start: 95, end: 95.36 },
+      { text: "again", start: 95.36, end: 96.12 },
+    ],
+    {
+      karaoke: [
+        { text: "You" },
+        { text: "always" },
+        { text: "save" },
+        { text: "me" },
+        { text: "again" },
+      ],
+    },
+  ),
   makeLine(
     [
       { text: "더", start: 96.12, end: 96.96 },
@@ -152,14 +163,26 @@ const lyricLines = [
       translation: "連同翻湧的波動",
     },
   ),
-  makeLine([
-    { text: "Oh", start: 115, end: 115.14 },
-    { text: "I", start: 115.14, end: 115.62 },
-    { text: "I", start: 115.62, end: 116.32 },
-    { text: "love", start: 116.32, end: 116.72 },
-    { text: "‘LOVE’", start: 116.72, end: 117.28 },
-    { text: "‘LOVE’", start: 117.28, end: 118 },
-  ]),
+  makeLine(
+    [
+      { text: "Oh", start: 115, end: 115.14 },
+      { text: "I", start: 115.14, end: 115.62 },
+      { text: "I", start: 115.62, end: 116.32 },
+      { text: "love", start: 116.32, end: 116.72 },
+      { text: "‘LOVE’", start: 116.72, end: 117.28 },
+      { text: "‘LOVE’", start: 117.28, end: 118 },
+    ],
+    {
+      karaoke: [
+        { text: "Oh" },
+        { text: "I" },
+        { text: "I" },
+        { text: "love" },
+        { text: "‘LOVE’" },
+        { text: "‘LOVE’" },
+      ],
+    },
+  ),
 ];
 
 function getTimedUnits(word: TimedWord) {
@@ -799,7 +822,11 @@ export default function Home() {
                 <div className="focus-assists">
                   {showKaraoke && focusLine.karaoke && (
                     <p className="assist-karaoke">
-                      <span>空耳</span>
+                      <span>
+                        {focusLine.words.some((word) => /^[가-힣]+$/.test(word.text))
+                          ? "空耳"
+                          : "EN"}
+                      </span>
                       <TimedKaraokeText
                         line={focusLine}
                         currentTime={currentTime}
