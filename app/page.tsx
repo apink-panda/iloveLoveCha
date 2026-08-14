@@ -196,6 +196,16 @@ function getTimedUnits(word: TimedWord) {
   }));
 }
 
+function getNextUnitStart(line: LyricLine, currentTime: number) {
+  for (const word of line.words) {
+    for (const unit of getTimedUnits(word)) {
+      if (unit.start > currentTime + 0.005) return unit.start;
+    }
+  }
+
+  return null;
+}
+
 function getTimedKaraokeUnits(word: TimedWord, token: KaraokeToken) {
   const parts = /^[가-힣]+$/.test(word.text) ? Array.from(token.text) : [token.text];
   const unitDuration = (word.end - word.start) / parts.length;
@@ -217,10 +227,12 @@ function TimedKaraokeText({
   line,
   currentTime,
   className,
+  nextUnitStart = null,
 }: {
   line: LyricLine;
   currentTime: number;
   className: string;
+  nextUnitStart?: number | null;
 }) {
   if (!line.karaoke) return null;
 
@@ -244,9 +256,11 @@ function TimedKaraokeText({
               const unitProgress = clamp(
                 (currentTime - unit.start) / (unit.end - unit.start),
               );
+              const isNextUnit =
+                nextUnitStart !== null && Math.abs(unit.start - nextUnitStart) < 0.001;
               return (
                 <span
-                  className="karaoke-unit"
+                  className={`karaoke-unit ${isNextUnit ? "is-next-unit" : ""}`}
                   key={`${token.text}-${unitIndex}`}
                   style={
                     {
@@ -524,6 +538,7 @@ export default function Home() {
     activeLine ??
     (phase === "finished" || hasCompletedLyrics ? finalLine : nextLine) ??
     lyricLines[0];
+  const focusNextUnitStart = getNextUnitStart(focusLine, currentTime);
   const focusLabel = activeLine
     ? "NOW · 現在唱"
     : phase === "finished" || hasCompletedLyrics
@@ -799,9 +814,12 @@ export default function Home() {
                         const unitProgress = clamp(
                           (currentTime - unit.start) / (unit.end - unit.start),
                         );
+                        const isNextUnit =
+                          focusNextUnitStart !== null &&
+                          Math.abs(unit.start - focusNextUnitStart) < 0.001;
                         return (
                           <span
-                            className="focus-unit"
+                            className={`focus-unit ${isNextUnit ? "is-next-unit" : ""}`}
                             key={`${word.text}-${unitIndex}`}
                             style={
                               {
@@ -831,6 +849,7 @@ export default function Home() {
                         line={focusLine}
                         currentTime={currentTime}
                         className="assist-copy"
+                        nextUnitStart={focusNextUnitStart}
                       />
                     </p>
                   )}
@@ -965,6 +984,9 @@ export default function Home() {
               {lyricLines.map((line, lineIndex) => {
                 const isPast = currentTime >= line.end;
                 const isCurrent = lineIndex === activeLineIndex;
+                const lineNextUnitStart = isCurrent
+                  ? getNextUnitStart(line, currentTime)
+                  : null;
 
                 return (
                   <button
@@ -989,9 +1011,12 @@ export default function Home() {
                                 const unitProgress = clamp(
                                   (currentTime - unit.start) / (unit.end - unit.start),
                                 );
+                                const isNextUnit =
+                                  lineNextUnitStart !== null &&
+                                  Math.abs(unit.start - lineNextUnitStart) < 0.001;
                                 return (
                                   <span
-                                    className="lyric-word"
+                                    className={`lyric-word ${isNextUnit ? "is-next-unit" : ""}`}
                                     key={`${word.text}-${unitIndex}`}
                                     style={
                                       {
@@ -1012,6 +1037,7 @@ export default function Home() {
                           line={line}
                           currentTime={currentTime}
                           className="line-assist line-karaoke"
+                          nextUnitStart={lineNextUnitStart}
                         />
                       )}
                       {showTranslation && line.translation && (

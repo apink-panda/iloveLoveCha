@@ -1150,6 +1150,32 @@ input:focus-visible {
   filter: drop-shadow(0 0 10px rgba(255, 117, 151, 0.18));
 }
 
+.focus-unit.is-next-unit,
+.lyric-word.is-next-unit,
+.karaoke-unit.is-next-unit {
+  display: inline-block;
+  background: linear-gradient(135deg, #fff0f5, #d8c8ff);
+  background-clip: text;
+  color: transparent;
+  text-decoration-line: underline;
+  text-decoration-color: rgba(255, 117, 151, 0.9);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.19em;
+  transform-origin: center bottom;
+  animation: next-unit-pulse 760ms ease-in-out infinite alternate;
+}
+
+@keyframes next-unit-pulse {
+  from {
+    filter: drop-shadow(0 0 2px rgba(255, 117, 151, 0.28));
+    transform: translateY(0) scale(1);
+  }
+  to {
+    filter: drop-shadow(0 0 10px rgba(162, 137, 255, 0.72));
+    transform: translateY(-1px) scale(1.08);
+  }
+}
+
 .lyric-line.is-past .line-number {
   color: var(--violet-soft);
 }
